@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import woodsRouter from "./routes/woods.js";
 import contactsRouter from "./routes/contacts.js";
+import authRouter from "./routes/auth.js";
 
 // Load environment variables
 dotenv.config();
@@ -18,6 +19,7 @@ app.use(express.json());
 // Routes
 app.use("/api/woods", woodsRouter);
 app.use("/api/contacts", contactsRouter);
+app.use("/api/auth", authRouter);
 
 // Health check
 app.get("/api/health", (req, res) => {

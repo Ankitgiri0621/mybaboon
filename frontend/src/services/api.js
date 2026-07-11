@@ -4,6 +4,39 @@ const API_BASE = import.meta.env.VITE_API_URL
   ? `${import.meta.env.VITE_API_URL}/api`
   : "/api";
 
+// Helper function to get token and headers
+const getAuthHeaders = () => {
+  const userInfo = localStorage.getItem("userInfo");
+  const token = userInfo ? JSON.parse(userInfo).token : null;
+  return token ? { "Authorization": `Bearer ${token}` } : {};
+};
+
+export const loginUser = async (email, password) => {
+  const response = await fetch(`${API_BASE}/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || "Login failed");
+  }
+  return response.json();
+};
+
+export const registerUser = async (name, email, password) => {
+  const response = await fetch(`${API_BASE}/auth/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, email, password }),
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || "Registration failed");
+  }
+  return response.json();
+};
+
 export const getWoods = async (limit) => {
   const url = limit ? `${API_BASE}/woods?limit=${limit}` : `${API_BASE}/woods`;
   const response = await fetch(url);
@@ -20,7 +53,10 @@ export const getWood = async (id) => {
 export const createWood = async (woodData) => {
   const response = await fetch(`${API_BASE}/woods`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      ...getAuthHeaders()
+    },
     body: JSON.stringify(woodData),
   });
   if (!response.ok) {
@@ -33,7 +69,10 @@ export const createWood = async (woodData) => {
 export const updateWood = async (id, woodData) => {
   const response = await fetch(`${API_BASE}/woods/${id}`, {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      ...getAuthHeaders()
+    },
     body: JSON.stringify(woodData),
   });
   if (!response.ok) {
@@ -46,6 +85,7 @@ export const updateWood = async (id, woodData) => {
 export const deleteWood = async (id) => {
   const response = await fetch(`${API_BASE}/woods/${id}`, {
     method: "DELETE",
+    headers: getAuthHeaders(),
   });
   if (!response.ok) {
     const error = await response.json();
