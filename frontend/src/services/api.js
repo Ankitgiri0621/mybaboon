@@ -11,17 +11,29 @@ const getAuthHeaders = () => {
   return token ? { "Authorization": `Bearer ${token}` } : {};
 };
 
+// Helper function to process response safely and prevent JSON parse errors
+const handleResponse = async (response, defaultErrorMsg) => {
+  const text = await response.text();
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch (err) {
+    throw new Error(`Server connection error (${response.status}): The server returned an invalid response format. Please check if the backend is running.`);
+  }
+
+  if (!response.ok) {
+    throw new Error(data.message || defaultErrorMsg);
+  }
+  return data;
+};
+
 export const loginUser = async (email, password) => {
   const response = await fetch(`${API_BASE}/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
   });
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || "Login failed");
-  }
-  return response.json();
+  return handleResponse(response, "Login failed");
 };
 
 export const registerUser = async (name, email, password) => {
@@ -30,24 +42,18 @@ export const registerUser = async (name, email, password) => {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ name, email, password }),
   });
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || "Registration failed");
-  }
-  return response.json();
+  return handleResponse(response, "Registration failed");
 };
 
 export const getWoods = async (limit) => {
   const url = limit ? `${API_BASE}/woods?limit=${limit}` : `${API_BASE}/woods`;
   const response = await fetch(url);
-  if (!response.ok) throw new Error("Failed to fetch stays");
-  return response.json();
+  return handleResponse(response, "Failed to fetch stays");
 };
 
 export const getWood = async (id) => {
   const response = await fetch(`${API_BASE}/woods/${id}`);
-  if (!response.ok) throw new Error("Failed to fetch stay");
-  return response.json();
+  return handleResponse(response, "Failed to fetch stay");
 };
 
 export const createWood = async (woodData) => {
@@ -59,11 +65,7 @@ export const createWood = async (woodData) => {
     },
     body: JSON.stringify(woodData),
   });
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || "Failed to create stay");
-  }
-  return response.json();
+  return handleResponse(response, "Failed to create stay");
 };
 
 export const updateWood = async (id, woodData) => {
@@ -75,11 +77,7 @@ export const updateWood = async (id, woodData) => {
     },
     body: JSON.stringify(woodData),
   });
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || "Failed to update stay");
-  }
-  return response.json();
+  return handleResponse(response, "Failed to update stay");
 };
 
 export const deleteWood = async (id) => {
@@ -87,11 +85,7 @@ export const deleteWood = async (id) => {
     method: "DELETE",
     headers: getAuthHeaders(),
   });
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || "Failed to delete stay");
-  }
-  return response.json();
+  return handleResponse(response, "Failed to delete stay");
 };
 
 export const submitContact = async (contactData) => {
@@ -100,9 +94,5 @@ export const submitContact = async (contactData) => {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(contactData),
   });
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || "Failed to submit contact");
-  }
-  return response.json();
+  return handleResponse(response, "Failed to submit contact");
 };
