@@ -1,4 +1,8 @@
-const API_BASE = "/api";
+// In production (Render), VITE_API_URL = https://your-backend.onrender.com
+// In development, falls back to /api which Vite proxies to localhost:5000
+const API_BASE = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL}/api`
+  : "/api";
 
 export const getWoods = async (limit) => {
   const url = limit ? `${API_BASE}/woods?limit=${limit}` : `${API_BASE}/woods`;
