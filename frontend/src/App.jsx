@@ -4,7 +4,7 @@ import About from "./routes/About";
 import Contact from "./routes/Contact";
 import Woods from "./routes/Woods/pages";
 import Home from "./routes/Home";
-import CMS from "./routes/CMS";
+import CMS from "./routes/cms";
 import Header from "./components/compound/Header";
 import Footer from "./components/compound/Footer";
 
