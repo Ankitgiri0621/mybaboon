@@ -1,8 +1,8 @@
-// In production (Render), VITE_API_URL = https://your-backend.onrender.com
-// In development, falls back to /api which Vite proxies to localhost:5000
 const API_BASE = import.meta.env.VITE_API_URL
   ? `${import.meta.env.VITE_API_URL}/api`
-  : "/api";
+  : typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
+    ? "/api"
+    : "https://mybaboon-1.onrender.com/api";
 
 // Helper function to get token and headers
 const getAuthHeaders = () => {
